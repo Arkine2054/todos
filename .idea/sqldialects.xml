@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/db/migrations/20250225200504_init_schema.down.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/20250225200504_init_schema.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/20250304142637_add_users_table.down.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/20250304142637_add_users_table.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/migrations/20250304171551_add_session_table.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/todos-api/storer/storer_postgres.go" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/todos-api/storer/storer_postgres_test.go" dialect="GenericSQL" />
+    <file url="PROJECT" dialect="PostgreSQL" />
+  </component>
+</project>
