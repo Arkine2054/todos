@@ -5,10 +5,15 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
-func ValidateEmail(email string) error {
-	return validation.Validate(&email, validation.Required, is.Email)
-}
+func Validate(email string, password string) error {
+	err := validation.Validate(email, validation.Required, is.Email)
+	if err != nil {
+		return err
+	}
+	err = validation.Validate(password, validation.Required, validation.Length(8, 50))
+	if err != nil {
+		return err
+	}
 
-func ValidatePassword(password string) error {
-	return validation.Validate(&password, validation.Required, validation.Length(8, 50))
+	return nil
 }

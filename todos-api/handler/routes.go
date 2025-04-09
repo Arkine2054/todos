@@ -16,12 +16,11 @@ func RegisterRouter(handler *handler) *chi.Mux {
 	r.Route("/todos", func(r chi.Router) {
 		r.With(GetAdminMiddlewareFunc(tokenMaker)).Get("/listall", handler.listTodos)
 
-		r.Route("/{id}", func(r chi.Router) {
+		r.Route("/", func(r chi.Router) {
 			r.Group(func(r chi.Router) {
 				r.Use(GetAuthMiddlewareFunc(tokenMaker))
 				r.Post("/", handler.createTodos)
 				r.Get("/list", handler.listTodos)
-				//r.Get("/pt", handler.PaginationTodos)
 				r.Get("/listuser", handler.listUserTodos)
 				r.Get("/get", handler.getTodos)
 				r.Patch("/", handler.updateTodos)

@@ -21,28 +21,14 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validation email and password
-	if err := util.ValidateEmail(u.Email); err != nil {
+	if err := util.Validate(u.Email, u.PasswordHash); err != nil {
 		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
 		return
 	}
 
-	if err := util.ValidatePassword(u.PasswordHash); err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
-	}
-
-	storerUser, err := h.server.GetUser(h.ctx, u.Email)
-	if err != nil {
-		if errors.Is(err, sqlErrCreateUser) {
-			http.Error(w, "error get data for creating user", http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// email exist
-	if u.Email == storerUser.Email {
-		h.logger.WithField("email", storerUser.Email).Warn("user is already exist")
-		http.Error(w, "email is already exist", http.StatusConflict)
+	_, err := h.server.GetUser(h.ctx, u.Email)
+	if err == nil && !errors.Is(err, sqlErrCreateUser) {
+		http.Error(w, "error get data for creating user", http.StatusInternalServerError)
 		return
 	}
 
@@ -105,10 +91,6 @@ func (h *handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	patchUserReq(user, u)
-
-	if user.Email == "" {
-		user.Email = claims.Email
-	}
 
 	updated, err := h.server.UpdateUser(h.ctx, user)
 	if err != nil {

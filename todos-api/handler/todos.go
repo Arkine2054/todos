@@ -23,7 +23,6 @@ func (h *handler) createTodos(w http.ResponseWriter, r *http.Request) {
 	st.UserID = claims.ID
 
 	todo, err := h.server.CreateTodos(h.ctx, st)
-	fmt.Println("todo:", todo)
 	if err != nil {
 		http.Error(w, "error creating todos", http.StatusInternalServerError)
 		return
@@ -41,13 +40,9 @@ func (h *handler) getTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := getID(r)
-	if err != nil {
-		http.Error(w, "invalid ID, have no access for this content", http.StatusForbidden)
-		return
-	}
+	claims := r.Context().Value(authKey{}).(*token.UserClaims)
 
-	todo, err := h.server.GetTodos(h.ctx, id, t.ID)
+	todo, err := h.server.GetTodos(h.ctx, claims.ID, t.ID)
 	if err != nil {
 		http.Error(w, "error getting todos", http.StatusInternalServerError)
 		return
@@ -59,11 +54,7 @@ func (h *handler) getTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) listUserTodos(w http.ResponseWriter, r *http.Request) {
-	id, err := getID(r)
-	if err != nil {
-		http.Error(w, "invalid ID, have no access for this content", http.StatusForbidden)
-		return
-	}
+	claims := r.Context().Value(authKey{}).(*token.UserClaims)
 
 	list, err := pageSortFilter(r)
 	if err != nil {
@@ -71,14 +62,14 @@ func (h *handler) listUserTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todos, err := h.server.ListUserTodos(h.ctx, id, list)
+	todos, err := h.server.ListUserTodos(h.ctx, claims.ID, list)
 	if err != nil {
 		http.Error(w, "error listing todos", http.StatusInternalServerError)
 		return
 	}
 
 	var res ListToDosRes
-	res.UserID = id
+	res.UserID = claims.ID
 	for _, t := range todos {
 		res.ToDos = append(res.ToDos, toTodosRes(&t))
 	}
@@ -91,7 +82,6 @@ func (h *handler) listUserTodos(w http.ResponseWriter, r *http.Request) {
 func (h *handler) listTodos(w http.ResponseWriter, r *http.Request) {
 
 	todos, err := h.server.ListTodos(h.ctx)
-	//fmt.Println("todos:", todos)
 	if err != nil {
 		http.Error(w, "error listing todos", http.StatusInternalServerError)
 		return
@@ -169,8 +159,6 @@ func pageSortFilter(r *http.Request) (list storer.List, err error) {
 
 	// Calculate the OFFSET
 	list.Offset = (int(page) - 1) * list.Limit
-
-	fmt.Println("errPSF:", err)
 
 	return list, err
 }

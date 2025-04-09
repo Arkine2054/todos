@@ -26,8 +26,8 @@ func (ps *PostgresStorer) GetUser(ctx context.Context, email string) (*Users, er
 	err := ps.db.GetContext(ctx, &u,
 		"SELECT id, email, password_hash, is_admin FROM users WHERE email=$1", email)
 	if err != nil {
-		// return nil or &u, in original we have return nil, but for emailExist check me change return to &u
-		return &u, fmt.Errorf("error getting user: %w", err)
+		ps.logger.Errorf("error getting user: %w", err)
+		return nil, fmt.Errorf("error getting user: %w", err)
 	}
 
 	return &u, nil
@@ -44,12 +44,6 @@ func (ps *PostgresStorer) ListUsers(ctx context.Context, list List) ([]Users, er
 	var users []Users
 	err := ps.db.SelectContext(ctx, &users, query, list.Limit, list.Offset)
 
-	//err := ps.db.SelectContext(ctx, &users,
-	//	"SELECT id, email, password_hash, is_admin, created_at, updated_at FROM users ORDER BY $1 LIMIT $2 OFFSET $3",
-	//	list.Sort,
-	//	list.Limit,
-	//	list.Offset,
-	//)
 	if err != nil {
 		return nil, fmt.Errorf("error listing users: %w", err)
 	}
@@ -59,7 +53,7 @@ func (ps *PostgresStorer) ListUsers(ctx context.Context, list List) ([]Users, er
 
 func (ps *PostgresStorer) UpdateUser(ctx context.Context, u *Users) (*Users, error) {
 	_, err := ps.db.NamedExecContext(ctx,
-		"UPDATE users SET email=:email, password_hash=:password_hash, is_admin=:is_admin, updated_at=:updated_at WHERE id=:id", u)
+		"UPDATE users SET email=:email, password_hash=:password_hash, is_admin=:is_admin, updated_at=:updated_at WHERE email=:email", u)
 	if err != nil {
 		return nil, fmt.Errorf("error updating user: %w", err)
 	}

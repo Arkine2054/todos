@@ -28,7 +28,7 @@ func main() {
 	logger.Info("Successfully connected to database")
 
 	//do something with the database
-	st := storer.NewPostgresStorer(db.GetDb())
+	st := storer.NewPostgresStorer(db.GetDb(), logger)
 	srv := server.NewServer(st)
 	hdl := handler.NewHandler(srv, logger, *secretKey)
 	handler.RegisterRouter(hdl)

@@ -24,7 +24,6 @@ func (ps *PostgresStorer) GetTodos(ctx context.Context, userID, todosID int) (*T
 	var t ToDos
 	err := ps.db.GetContext(ctx, &t,
 		"SELECT id, user_id, title, completed, description FROM todos WHERE user_id=$1 AND id=$2", userID, todosID)
-	//fmt.Println("t:", t)
 
 	if err != nil {
 		return nil, fmt.Errorf("error getting todos: %w", err)
@@ -40,15 +39,6 @@ func (ps *PostgresStorer) ListUserTodos(ctx context.Context, userID int, list Li
 
 	var todos []ToDos
 	err := ps.db.SelectContext(ctx, &todos, query, userID, list.Title, list.Limit, list.Offset)
-
-	//err := ps.db.SelectContext(ctx, &todos,
-	//	"SELECT id, title, description, completed, created_at, updated_at FROM todos WHERE user_id=$1 AND title ILIKE $2 ORDER BY $3 LIMIT $4 OFFSET $5",
-	//	userID,
-	//	list.Title,
-	//	list.Order,
-	//	list.Limit,
-	//	list.Offset,
-	//)
 	if err != nil {
 		return nil, fmt.Errorf("error listing todos: %w", err)
 	}
@@ -58,7 +48,7 @@ func (ps *PostgresStorer) ListUserTodos(ctx context.Context, userID int, list Li
 
 func (ps *PostgresStorer) ListTodos(ctx context.Context) ([]ToDos, error) {
 	var todos []ToDos
-	//correct select statement in test
+
 	err := ps.db.SelectContext(ctx, &todos,
 		"SELECT id, title, description, completed, created_at, updated_at FROM todos")
 	if err != nil {
